@@ -10,15 +10,24 @@ export default defineEventHandler(async (event) => {
     if (process.env.INIT_TABLE !== "false") await userTable.init()
     if (event.method === "GET") {
       const { data, updated } = await userTable.getData(id)
+      const parsed = data ? JSON.parse(data) : undefined
+      if (parsed?.data) {
+        return {
+          data: parsed.data,
+          focusTabs: parsed.focusTabs,
+          autoRefresh: parsed.autoRefresh,
+          updatedTime: updated,
+        }
+      }
       return {
-        data: data ? JSON.parse(data) : undefined,
+        data: parsed,
         updatedTime: updated,
       }
     } else if (event.method === "POST") {
       const body = await readBody(event)
       verifyPrimitiveMetadata(body)
-      const { updatedTime, data } = body
-      await userTable.setData(id, JSON.stringify(data), updatedTime)
+      const { updatedTime, data, focusTabs, autoRefresh } = body
+      await userTable.setData(id, JSON.stringify({ data, focusTabs, autoRefresh }), updatedTime)
       return {
         success: true,
         updatedTime,

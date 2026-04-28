@@ -1,8 +1,11 @@
 import process from "node:process"
-import { SignJWT } from "jose"
 import { UserTable } from "#/database/user"
+import { createUserToken } from "#/utils/auth"
 
 export default defineEventHandler(async (event) => {
+  if (!process.env.G_CLIENT_ID || !process.env.G_CLIENT_SECRET)
+    throw createError({ statusCode: 506, message: "GitHub login is not configured" })
+
   const db = useDatabase()
   const userTable = db ? new UserTable(db) : undefined
   if (!userTable) throw new Error("db is not defined")
@@ -45,13 +48,7 @@ export default defineEventHandler(async (event) => {
   const userID = String(userInfo.id)
   await userTable.addUser(userID, userInfo.notification_email || userInfo.email, "github")
 
-  const jwtToken = await new SignJWT({
-    id: userID,
-    type: "github",
-  })
-    .setExpirationTime("60d")
-    .setProtectedHeader({ alg: "HS256" })
-    .sign(new TextEncoder().encode(process.env.JWT_SECRET!))
+  const jwtToken = await createUserToken(userID, "github")
 
   // nitro 有 bug，在 cloudflare 里没法 set cookie
   // seconds

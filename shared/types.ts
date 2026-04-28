@@ -30,7 +30,24 @@ export type Metadata = Record<ColumnID, Column>
 export interface PrimitiveMetadata {
   updatedTime: number
   data: Record<FixedColumnID, SourceID[]>
+  focusTabs?: FocusTabsState
+  autoRefresh?: AutoRefreshState
   action: "init" | "manual" | "sync"
+}
+
+export interface AutoRefreshState {
+  enabledSources: SourceID[]
+}
+
+export interface FocusTab {
+  id: string
+  name: string
+  sources: SourceID[]
+}
+
+export interface FocusTabsState {
+  currentId: string
+  tabs: FocusTab[]
 }
 
 export type FixedColumnID = (typeof fixedColumnIds)[number]

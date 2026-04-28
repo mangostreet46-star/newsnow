@@ -4,7 +4,9 @@ import { AnimatePresence, motion, useInView } from "framer-motion"
 import { useWindowSize } from "react-use"
 import { forwardRef, useImperativeHandle } from "react"
 import { OverlayScrollbar } from "../common/overlay-scrollbar"
+import { FocusTabSelector } from "../common/focus-tab-selector"
 import { safeParseString } from "~/utils"
+import { autoRefreshSourcesAtom } from "~/atoms"
 
 export interface ItemsProps extends React.HTMLAttributes<HTMLDivElement> {
   id: SourceID
@@ -19,6 +21,8 @@ interface NewsCardProps {
   id: SourceID
   setHandleRef?: (ref: HTMLElement | null) => void
 }
+
+const AUTO_REFRESH_INTERVAL = 30 * 60 * 1000
 
 export const CardWrapper = forwardRef<HTMLElement, ItemsProps>(({ id, isDragging, setHandleRef, style, ...props }, dndRef) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -52,6 +56,16 @@ export const CardWrapper = forwardRef<HTMLElement, ItemsProps>(({ id, isDragging
 
 function NewsCard({ id, setHandleRef }: NewsCardProps) {
   const { refresh } = useRefetch()
+  const [autoRefreshSources, setAutoRefreshSources] = useAtom(autoRefreshSourcesAtom)
+  const autoRefreshEnabled = autoRefreshSources.includes(id)
+  const toggleAutoRefresh = useCallback(() => {
+    if (autoRefreshEnabled) {
+      setAutoRefreshSources(prev => prev.filter(item => item !== id))
+    } else {
+      setAutoRefreshSources(prev => [...prev, id])
+      refresh(id)
+    }
+  }, [autoRefreshEnabled, id, refresh, setAutoRefreshSources])
   const { data, isFetching, isError } = useQuery({
     queryKey: ["source", id],
     queryFn: async ({ queryKey }) => {
@@ -63,7 +77,7 @@ function NewsCard({ id, setHandleRef }: NewsCardProps) {
         const jwt = safeParseString(localStorage.getItem("jwt"))
         if (jwt) headers.Authorization = `Bearer ${jwt}`
         refetchSources.delete(id)
-      } else if (cacheSources.has(id)) {
+      } else if (!autoRefreshEnabled && cacheSources.has(id)) {
         // wait animation
         await delay(200)
         return cacheSources.get(id)
@@ -99,10 +113,12 @@ function NewsCard({ id, setHandleRef }: NewsCardProps) {
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
+    refetchInterval: autoRefreshEnabled ? AUTO_REFRESH_INTERVAL : false,
     retry: false,
   })
 
   const { isFocused, toggleFocus } = useFocusWith(id)
+  const currentColumnID = useAtomValue(currentColumnIDAtom)
 
   return (
     <>
@@ -133,6 +149,17 @@ function NewsCard({ id, setHandleRef }: NewsCardProps) {
         <div className={$("flex gap-2 text-lg", `color-${sources[id].color}`)}>
           <button
             type="button"
+            title={autoRefreshEnabled ? "关闭自动刷新" : "开启自动刷新"}
+            className={$(
+              "btn transition-all",
+              autoRefreshEnabled
+                ? "i-ph:timer-fill bg-base bg-op-60! scale-110 animate-spin"
+                : "i-ph:timer-duotone op-70",
+            )}
+            onClick={toggleAutoRefresh}
+          />
+          <button
+            type="button"
             className={$("btn i-ph:arrow-counter-clockwise-duotone", isFetching && "animate-spin i-ph:circle-dashed-duotone")}
             onClick={() => refresh(id)}
           />
@@ -141,6 +168,7 @@ function NewsCard({ id, setHandleRef }: NewsCardProps) {
             className={$("btn", isFocused ? "i-ph:star-fill" : "i-ph:star-duotone")}
             onClick={toggleFocus}
           />
+          {currentColumnID === "focus" && isFocused && <MoveFocusTabButton id={id} />}
           {/* firefox cannot drag a button */}
           {setHandleRef && (
             <div
@@ -166,6 +194,26 @@ function NewsCard({ id, setHandleRef }: NewsCardProps) {
           {!!data?.items?.length && (sources[id].type === "hottest" ? <NewsListHot items={data.items} /> : <NewsListTimeLine items={data.items} />)}
         </div>
       </OverlayScrollbar>
+    </>
+  )
+}
+
+function MoveFocusTabButton({ id }: { id: SourceID }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <button
+        type="button"
+        title="选择分组"
+        className="btn i-ph:folder-duotone"
+        onClick={() => setOpen(true)}
+      />
+      <FocusTabSelector
+        sourceId={id}
+        open={open}
+        onClose={() => setOpen(false)}
+      />
     </>
   )
 }

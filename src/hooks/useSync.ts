@@ -1,7 +1,8 @@
 import type { PrimitiveMetadata } from "@shared/types"
-import { useDebounce, useMount } from "react-use"
+import { useDebounce } from "react-use"
 import { useLogin } from "./useLogin"
 import { useToast } from "./useToast"
+import { createInitialPrimitiveMetadata } from "~/atoms/primitiveMetadataAtom"
 import { safeParseString } from "~/utils"
 
 async function uploadMetadata(metadata: PrimitiveMetadata) {
@@ -14,6 +15,8 @@ async function uploadMetadata(metadata: PrimitiveMetadata) {
     },
     body: {
       data: metadata.data,
+      focusTabs: metadata.focusTabs,
+      autoRefresh: metadata.autoRefresh,
       updatedTime: metadata.updatedTime,
     },
   })
@@ -22,7 +25,7 @@ async function uploadMetadata(metadata: PrimitiveMetadata) {
 async function downloadMetadata(): Promise<PrimitiveMetadata | undefined> {
   const jwt = safeParseString(localStorage.getItem("jwt"))
   if (!jwt) return
-  const { data, updatedTime } = await myFetch("/me/sync", {
+  const { data, focusTabs, autoRefresh, updatedTime } = await myFetch("/me/sync", {
     headers: {
       Authorization: `Bearer ${jwt}`,
     },
@@ -32,14 +35,17 @@ async function downloadMetadata(): Promise<PrimitiveMetadata | undefined> {
     return {
       action: "sync",
       data,
+      focusTabs,
+      autoRefresh,
       updatedTime,
     }
   }
+  return createInitialPrimitiveMetadata("sync", updatedTime ?? Date.now())
 }
 
 export function useSync() {
   const [primitiveMetadata, setPrimitiveMetadata] = useAtom(primitiveMetadataAtom)
-  const { logout, login } = useLogin()
+  const { logout, login, loggedIn } = useLogin()
   const toaster = useToast()
 
   useDebounce(async () => {
@@ -64,12 +70,18 @@ export function useSync() {
       fn()
     }
   }, 10000, [primitiveMetadata])
-  useMount(() => {
+  useEffect(() => {
+    if (!loggedIn) return
+
     const fn = async () => {
       try {
         const metadata = await downloadMetadata()
         if (metadata) {
-          setPrimitiveMetadata(preprocessMetadata(metadata))
+          setPrimitiveMetadata(prev => preprocessMetadata({
+            ...metadata,
+            focusTabs: metadata.focusTabs ?? prev.focusTabs,
+            autoRefresh: metadata.autoRefresh ?? prev.autoRefresh,
+          }))
         }
       } catch (e: any) {
         if (e.statusCode !== 506) {
@@ -85,5 +97,5 @@ export function useSync() {
       }
     }
     fn()
-  })
+  }, [loggedIn, login, logout, setPrimitiveMetadata, toaster])
 }

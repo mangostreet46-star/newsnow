@@ -307,6 +307,42 @@
     "interval": 1800000,
     "title": "头条"
   },
+  "panews": {
+    "redirect": "panews-flash",
+    "name": "PANews",
+    "type": "realtime",
+    "column": "crypto",
+    "home": "https://www.panewslab.com/zh/news",
+    "color": "amber",
+    "interval": 120000,
+    "title": "快讯"
+  },
+  "panews-flash": {
+    "name": "PANews",
+    "type": "realtime",
+    "column": "crypto",
+    "home": "https://www.panewslab.com/zh/news",
+    "color": "amber",
+    "interval": 120000,
+    "title": "快讯"
+  },
+  "panews-article": {
+    "name": "PANews",
+    "type": "realtime",
+    "column": "crypto",
+    "home": "https://www.panewslab.com/zh/articles",
+    "color": "amber",
+    "interval": 1800000,
+    "title": "文章"
+  },
+  "gzu521": {
+    "name": "贵易考",
+    "type": "realtime",
+    "column": "jobs",
+    "home": "https://www.gzu521.net/infotype-53-0.html",
+    "color": "green",
+    "interval": 1800000
+  },
   "solidot": {
     "name": "Solidot",
     "column": "tech",

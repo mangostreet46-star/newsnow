@@ -4,6 +4,7 @@ import type { SourceID } from "@shared/types"
 import { useMemo, useRef, useState } from "react"
 import pinyin from "@shared/pinyin.json"
 import { OverlayScrollbar } from "../overlay-scrollbar"
+import { FocusTabSelector } from "../focus-tab-selector"
 import { CardWrapper } from "~/components/column/card"
 
 import "./cmdk.css"
@@ -38,6 +39,7 @@ function groupByColumn(items: SourceItemProps[]) {
 
 export function SearchBar() {
   const { opened, toggle } = useSearchBar()
+  const [editingSource, setEditingSource] = useState<SourceID | undefined>()
   const sourceItems = useMemo(
     () =>
       groupByColumn(typeSafeObjectEntries(sources)
@@ -54,6 +56,10 @@ export function SearchBar() {
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   const [value, setValue] = useState<SourceID>("github-trending-today")
+  const openFocusTabSelector = (id: SourceID) => {
+    setEditingSource(id)
+    toggle(false)
+  }
 
   useMount(() => {
     inputRef?.current?.focus()
@@ -70,55 +76,78 @@ export function SearchBar() {
   })
 
   return (
-    <Command.Dialog
-      open={opened}
-      onOpenChange={toggle}
-      value={value}
-      onValueChange={(v) => {
-        if (v in sources) {
-          setValue(v as SourceID)
-        }
-      }}
-    >
-      <Command.Input
-        ref={inputRef}
-        autoFocus
-        placeholder="搜索你想要的"
-      />
-      <div className="md:flex pt-2">
-        <OverlayScrollbar defer className="overflow-y-auto md:min-w-275px">
-          <Command.List>
-            <Command.Empty> 没有找到，可以前往 Github 提 issue </Command.Empty>
-            {
-              sourceItems.map(({ column, sources }) => (
-                <Command.Group heading={column} key={column}>
-                  {
-                    sources.map(item => <SourceItem item={item} key={item.id} />)
-                  }
-                </Command.Group>
-              ),
-              )
-            }
-          </Command.List>
-        </OverlayScrollbar>
-        <div className="flex-1 pt-2 px-4 min-w-350px max-md:hidden">
-          <CardWrapper id={value} />
+    <>
+      <Command.Dialog
+        open={opened}
+        onOpenChange={toggle}
+        value={value}
+        onValueChange={(v) => {
+          if (v in sources) {
+            setValue(v as SourceID)
+          }
+        }}
+      >
+        <Command.Input
+          ref={inputRef}
+          autoFocus
+          placeholder="搜索你想要的"
+        />
+        <div className="md:flex pt-2">
+          <OverlayScrollbar defer className="overflow-y-auto md:min-w-275px">
+            <Command.List>
+              <Command.Empty> 没有找到，可以前往 Github 提 issue </Command.Empty>
+              {
+                sourceItems.map(({ column, sources }) => (
+                  <Command.Group heading={column} key={column}>
+                    {
+                      sources.map(item => <SourceItem item={item} key={item.id} onEdit={openFocusTabSelector} />)
+                    }
+                  </Command.Group>
+                ),
+                )
+              }
+            </Command.List>
+          </OverlayScrollbar>
+          <div className="flex-1 pt-2 px-4 min-w-350px max-md:hidden">
+            <CardWrapper id={value} />
+          </div>
         </div>
-      </div>
-    </Command.Dialog>
+      </Command.Dialog>
+      {editingSource && (
+        <FocusTabSelector
+          sourceId={editingSource}
+          open={!!editingSource}
+          defaultToCurrentTab
+          onClose={() => setEditingSource(undefined)}
+        />
+      )}
+    </>
   )
 }
 
-function SourceItem({ item }: {
+function SourceItem({ item, onEdit }: {
   item: SourceItemProps
+  onEdit: (id: SourceID) => void
 }) {
-  const { isFocused, toggleFocus } = useFocusWith(item.id)
+  const { isFocused } = useFocusWith(item.id)
+  const stopPointerEvent = (e: React.PointerEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+  }
+  const stopMouseEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  const edit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    stopMouseEvent(e)
+    onEdit(item.id)
+  }
+
   return (
     <Command.Item
       keywords={[item.name, item.title ?? "", item.pinyin]}
       value={item.id}
       className="flex justify-between items-center p-2"
-      onSelect={toggleFocus}
+      onSelect={() => onEdit(item.id)}
     >
       <span className="flex gap-2 items-center">
         <span
@@ -130,7 +159,14 @@ function SourceItem({ item }: {
         <span>{item.name}</span>
         <span className="text-xs text-neutral-400/80 self-end mb-3px">{item.title}</span>
       </span>
-      <span className={$(isFocused ? "i-ph-star-fill" : "i-ph-star-duotone", "bg-primary op-40")}></span>
+      <button
+        type="button"
+        title="选择关注分组"
+        className={$("btn shrink-0 text-lg bg-primary op-40", isFocused ? "i-ph-star-fill" : "i-ph-star-duotone")}
+        onPointerDownCapture={stopPointerEvent}
+        onMouseDownCapture={stopMouseEvent}
+        onClick={edit}
+      />
     </Command.Item>
   )
 }

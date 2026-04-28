@@ -244,6 +244,34 @@ export const originSources = {
       },
     },
   },
+  "panews": {
+    name: "PANews",
+    color: "amber",
+    home: "https://www.panewslab.com",
+    column: "crypto",
+    sub: {
+      flash: {
+        title: "快讯",
+        type: "realtime",
+        interval: Time.Realtime,
+        home: "https://www.panewslab.com/zh/news",
+      },
+      article: {
+        title: "文章",
+        type: "realtime",
+        interval: Time.Common,
+        home: "https://www.panewslab.com/zh/articles",
+      },
+    },
+  },
+  "gzu521": {
+    name: "贵易考",
+    color: "green",
+    column: "jobs",
+    type: "realtime",
+    interval: Time.Common,
+    home: "https://www.gzu521.net/infotype-53-0.html",
+  },
   "solidot": {
     name: "Solidot",
     color: "teal",
