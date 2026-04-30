@@ -106,6 +106,7 @@ export interface NewsItem {
   title: string
   url: string
   mobileUrl?: string
+  appUrl?: string
   pubDate?: number | string
   extra?: {
     hover?: string

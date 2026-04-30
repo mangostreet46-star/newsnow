@@ -274,16 +274,47 @@ function NewsUpdatedTime({ date }: { date: string | number }) {
   const relativeTime = useRelativeTime(date)
   return <>{relativeTime}</>
 }
+
+function getNewsUrl(item: NewsItem, width: number) {
+  return width < 768 ? item.mobileUrl || item.url : item.url
+}
+
+async function copyText(text: string) {
+  try {
+    await navigator.clipboard?.writeText(text)
+  } catch {
+    const textarea = document.createElement("textarea")
+    textarea.value = text
+    textarea.style.position = "fixed"
+    textarea.style.opacity = "0"
+    document.body.append(textarea)
+    textarea.focus()
+    textarea.select()
+    document.execCommand("copy")
+    textarea.remove()
+  }
+}
+
+async function handleNewsLinkClick(event: React.MouseEvent<HTMLAnchorElement>, item: NewsItem, width: number) {
+  if (width >= 768 || !item.appUrl) return
+  const openApp = window.confirm(`是否复制「${item.title}」并打开抖音 App 搜索页？\n\n取消将继续打开网页版搜索结果。`)
+  if (!openApp) return
+  event.preventDefault()
+  await copyText(item.title)
+  window.location.href = item.appUrl
+}
+
 function NewsListHot({ items }: { items: NewsItem[] }) {
   const { width } = useWindowSize()
   return (
     <ol className="flex flex-col gap-2">
       {items?.map((item, i) => (
         <a
-          href={width < 768 ? item.mobileUrl || item.url : item.url}
+          href={getNewsUrl(item, width)}
           target="_blank"
           key={item.id}
           title={item.extra?.hover}
+          onClick={event => handleNewsLinkClick(event, item, width)}
           className={$(
             "flex gap-2 items-center items-stretch relative cursor-pointer [&_*]:cursor-pointer transition-all",
             "hover:bg-neutral-400/10 rounded-md pr-1 visited:(text-neutral-400)",
@@ -327,10 +358,11 @@ function NewsListTimeLine({ items }: { items: NewsItem[] }) {
               "ml-2 px-1 hover:bg-neutral-400/10 rounded-md visited:(text-neutral-400/80)",
               "cursor-pointer [&_*]:cursor-pointer transition-all",
             )}
-            href={width < 768 ? item.mobileUrl || item.url : item.url}
+            href={getNewsUrl(item, width)}
             title={item.extra?.hover}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={event => handleNewsLinkClick(event, item, width)}
           >
             {item.title}
           </a>

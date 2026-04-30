@@ -18,7 +18,29 @@ services:
       - INIT_TABLE=true
       - ENABLE_CACHE=true
       - PRODUCTHUNT_API_TOKEN=
+      - TRANSLATE_PROVIDER=libretranslate
+      - TRANSLATE_API_KEY=
+      - TRANSLATE_API_URL=http://libretranslate:5000/translate
+      - TRANSLATE_SOURCE=en
+      - TRANSLATE_TARGET=zh
+      - TRANSLATE_CONCURRENCY=2
+      - TRANSLATE_TIMEOUT=30000
+      - TRANSLATE_MODEL=gpt-4o-mini
+    depends_on:
+      - libretranslate
+
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: libretranslate
+    restart: unless-stopped
+    volumes:
+      - libretranslate_data:/home/libretranslate/.local
+    environment:
+      - LT_LOAD_ONLY=en,zh,ja,ko
+      - LT_UPDATE_MODELS=true
 
 volumes:
   newsnow_data:
     name: newsnow_data
+  libretranslate_data:
+    name: libretranslate_data

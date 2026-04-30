@@ -49,6 +49,15 @@ export const originSources = {
     desc: "来自第三方网站: 早晨报",
     home: "https://www.zaobao.com",
   },
+  "reddit": {
+    name: "Reddit中文",
+    title: "热门",
+    type: "hottest",
+    column: "world",
+    color: "orange",
+    interval: Time.Common,
+    home: "https://www.reddit.com",
+  },
   "coolapk": {
     name: "酷安",
     type: "hottest",

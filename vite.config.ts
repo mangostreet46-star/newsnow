@@ -26,7 +26,10 @@ export default defineConfig({
       // autoCodeSplitting: true,
     }),
     unimport.vite({
-      dirs: ["src/hooks", "shared", "src/utils", "src/atoms"],
+      dirs: ["src/hooks", "shared", "src/utils"],
+      dirsScanOptions: {
+        fileFilter: file => !file.endsWith("/shared/dir.ts"),
+      },
       presets: ["react", {
         from: "jotai",
         imports: ["atom", "useAtom", "useAtomValue", "useSetAtom"],
@@ -34,6 +37,18 @@ export default defineConfig({
       imports: [
         { from: "clsx", name: "clsx", as: "$" },
         { from: "jotai/utils", name: "atomWithStorage" },
+        { from: "~/atoms", name: "autoRefreshSourcesAtom" },
+        { from: "~/atoms", name: "currentColumnIDAtom" },
+        { from: "~/atoms", name: "currentFocusTabAtom" },
+        { from: "~/atoms", name: "currentFocusTabSourcesAtom" },
+        { from: "~/atoms", name: "currentSourcesAtom" },
+        { from: "~/atoms", name: "focusSourcesAtom" },
+        { from: "~/atoms", name: "focusTabActionsAtom" },
+        { from: "~/atoms", name: "focusTabsAtom" },
+        { from: "~/atoms", name: "goToTopAtom" },
+        { from: "~/atoms/primitiveMetadataAtom", name: "createInitialPrimitiveMetadata" },
+        { from: "~/atoms/primitiveMetadataAtom", name: "preprocessMetadata" },
+        { from: "~/atoms/primitiveMetadataAtom", name: "primitiveMetadataAtom" },
       ],
       dts: "imports.app.d.ts",
     }),

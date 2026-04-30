@@ -14,16 +14,19 @@ export function Column({ id }: { id: FixedColumnID }) {
 
   return (
     <>
-      <div className="flex justify-center md:hidden mb-6">
-        <NavBar />
+      <div className="sticky top-[72px] z-9 md:hidden mb-6 flex flex-col items-center gap-3 py-2 backdrop-blur-md">
+        <div className="flex justify-center">
+          <NavBar />
+        </div>
+        {id === "focus" && <FocusTabsBar />}
       </div>
-      {id === "focus" && <FocusTabsBar />}
+      {id === "focus" && <FocusTabsBar className="hidden md:flex sticky top-[80px] lg:top-[96px] z-9 mb-6 py-2 backdrop-blur-md" />}
       {id === currentColumnID && <Dnd />}
     </>
   )
 }
 
-function FocusTabsBar() {
+function FocusTabsBar({ className }: { className?: string }) {
   const focusTabs = useAtomValue(focusTabsAtom)
   const dispatch = useSetAtom(focusTabActionsAtom)
   const currentTab = focusTabs.tabs.find(tab => tab.id === focusTabs.currentId) ?? focusTabs.tabs[0]
@@ -47,7 +50,7 @@ function FocusTabsBar() {
   }, [currentTab, dispatch, focusTabs.tabs.length])
 
   return (
-    <div className="flex justify-center mb-6">
+    <div className={$("flex justify-center", className ?? "")}>
       <div className="flex items-center gap-2 max-w-full overflow-x-auto px-2 py-2 rounded-2xl bg-primary/1 shadow shadow-primary/20">
         {focusTabs.tabs.map(tab => (
           <button

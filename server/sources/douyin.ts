@@ -4,6 +4,7 @@ interface Res {
       sentence_id: string
       word: string
       event_time: string
+      group_id?: string
       hot_value: string
     }[]
   }
@@ -18,10 +19,14 @@ export default defineSource(async () => {
     },
   })
   return res.data.word_list.map((k) => {
+    const url = `https://www.douyin.com/hot/${k.sentence_id}`
+    const mobileUrl = `https://www.douyin.com/search/${encodeURIComponent(k.word)}?type=general`
     return {
       id: k.sentence_id,
       title: k.word,
-      url: `https://www.douyin.com/hot/${k.sentence_id}`,
+      url,
+      mobileUrl,
+      appUrl: "snssdk1128://search",
     }
   })
 })

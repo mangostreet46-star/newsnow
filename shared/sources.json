@@ -42,6 +42,15 @@
     "color": "red",
     "interval": 1800000
   },
+  "reddit": {
+    "title": "热门",
+    "name": "Reddit中文",
+    "type": "hottest",
+    "column": "world",
+    "home": "https://www.reddit.com",
+    "color": "orange",
+    "interval": 1800000
+  },
   "coolapk": {
     "title": "今日最热",
     "name": "酷安",
