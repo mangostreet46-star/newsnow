@@ -42,13 +42,86 @@
     "color": "red",
     "interval": 1800000
   },
+  "buzzing": {
+    "title": "国外新闻",
+    "name": "Buzzing",
+    "type": "realtime",
+    "column": "world",
+    "home": "https://news.buzzing.cc/",
+    "color": "sky",
+    "interval": 300000
+  },
+  "buzzing-hn": {
+    "title": "Hacker News",
+    "name": "Buzzing",
+    "type": "hottest",
+    "column": "tech",
+    "home": "https://hn.buzzing.cc/",
+    "color": "orange",
+    "interval": 300000
+  },
   "reddit": {
-    "title": "热门",
+    "redirect": "reddit-ai",
+    "name": "Reddit中文",
+    "type": "hottest",
+    "column": "tech",
+    "home": "https://www.reddit.com",
+    "color": "orange",
+    "interval": 1800000,
+    "title": "AI/编程"
+  },
+  "reddit-ai": {
+    "name": "Reddit中文",
+    "type": "hottest",
+    "column": "tech",
+    "home": "https://www.reddit.com",
+    "color": "orange",
+    "interval": 1800000,
+    "title": "AI/编程"
+  },
+  "reddit-tech": {
+    "name": "Reddit中文",
+    "type": "hottest",
+    "column": "tech",
+    "home": "https://www.reddit.com",
+    "color": "orange",
+    "interval": 1800000,
+    "title": "科技"
+  },
+  "reddit-world": {
     "name": "Reddit中文",
     "type": "hottest",
     "column": "world",
     "home": "https://www.reddit.com",
     "color": "orange",
+    "interval": 1800000,
+    "title": "国际新闻"
+  },
+  "reddit-finance": {
+    "name": "Reddit中文",
+    "type": "hottest",
+    "column": "finance",
+    "home": "https://www.reddit.com",
+    "color": "orange",
+    "interval": 1800000,
+    "title": "金融市场"
+  },
+  "reddit-security": {
+    "name": "Reddit中文",
+    "type": "hottest",
+    "column": "tech",
+    "home": "https://www.reddit.com",
+    "color": "orange",
+    "interval": 1800000,
+    "title": "网络安全"
+  },
+  "sopilot": {
+    "title": "热门推文",
+    "name": "Sopilot",
+    "type": "hottest",
+    "column": "tech",
+    "home": "https://sopilot.net",
+    "color": "sky",
     "interval": 1800000
   },
   "coolapk": {

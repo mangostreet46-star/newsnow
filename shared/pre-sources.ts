@@ -49,14 +49,62 @@ export const originSources = {
     desc: "来自第三方网站: 早晨报",
     home: "https://www.zaobao.com",
   },
+  "buzzing": {
+    name: "Buzzing",
+    title: "国外新闻",
+    type: "realtime",
+    column: "world",
+    color: "sky",
+    interval: Time.Fast,
+    home: "https://news.buzzing.cc/",
+  },
+  "buzzing-hn": {
+    name: "Buzzing",
+    title: "Hacker News",
+    type: "hottest",
+    column: "tech",
+    color: "orange",
+    interval: Time.Fast,
+    home: "https://hn.buzzing.cc/",
+  },
   "reddit": {
     name: "Reddit中文",
-    title: "热门",
     type: "hottest",
     column: "world",
     color: "orange",
     interval: Time.Common,
     home: "https://www.reddit.com",
+    sub: {
+      ai: {
+        title: "AI/编程",
+        column: "tech",
+      },
+      tech: {
+        title: "科技",
+        column: "tech",
+      },
+      world: {
+        title: "国际新闻",
+        column: "world",
+      },
+      finance: {
+        title: "金融市场",
+        column: "finance",
+      },
+      security: {
+        title: "网络安全",
+        column: "tech",
+      },
+    },
+  },
+  "sopilot": {
+    name: "Sopilot",
+    title: "热门推文",
+    type: "hottest",
+    column: "tech",
+    color: "sky",
+    interval: Time.Common,
+    home: "https://sopilot.net",
   },
   "coolapk": {
     name: "酷安",

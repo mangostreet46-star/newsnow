@@ -23,7 +23,7 @@ services:
       - TRANSLATE_API_URL=http://libretranslate:5000/translate
       - TRANSLATE_SOURCE=en
       - TRANSLATE_TARGET=zh
-      - TRANSLATE_CONCURRENCY=2
+      - TRANSLATE_CONCURRENCY=8
       - TRANSLATE_TIMEOUT=30000
       - TRANSLATE_MODEL=gpt-4o-mini
     depends_on:

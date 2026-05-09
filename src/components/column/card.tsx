@@ -275,6 +275,23 @@ function NewsUpdatedTime({ date }: { date: string | number }) {
   return <>{relativeTime}</>
 }
 
+function NewsItemMeta({ item }: { item: NewsItem }) {
+  const date = item.pubDate || item?.extra?.date
+  const hasExtra = !!(item?.extra?.info || item?.extra?.icon)
+
+  return (
+    <>
+      {hasExtra && <ExtraInfo item={item} />}
+      {date && (
+        <>
+          {hasExtra && " · "}
+          <NewsUpdatedTime date={date} />
+        </>
+      )}
+    </>
+  )
+}
+
 function getNewsUrl(item: NewsItem, width: number) {
   return width < 768 ? item.mobileUrl || item.url : item.url
 }
@@ -297,6 +314,7 @@ async function copyText(text: string) {
 
 async function handleNewsLinkClick(event: React.MouseEvent<HTMLAnchorElement>, item: NewsItem, width: number) {
   if (width >= 768 || !item.appUrl) return
+  // eslint-disable-next-line no-alert
   const openApp = window.confirm(`是否复制「${item.title}」并打开抖音 App 搜索页？\n\n取消将继续打开网页版搜索结果。`)
   if (!openApp) return
   event.preventDefault()
@@ -328,8 +346,8 @@ function NewsListHot({ items }: { items: NewsItem[] }) {
             <span className="mr-2 text-base">
               {item.title}
             </span>
-            <span className="text-xs text-neutral-400/80 truncate align-middle">
-              <ExtraInfo item={item} />
+            <span className="text-xs text-neutral-400/80 align-middle break-words">
+              <NewsItemMeta item={item} />
             </span>
           </span>
         </a>
