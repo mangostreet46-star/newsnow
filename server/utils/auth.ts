@@ -1,3 +1,4 @@
+import process from "node:process"
 import { SignJWT } from "jose"
 import type { UserInfo } from "#/types"
 
@@ -6,7 +7,6 @@ export async function createUserToken(id: string, type: UserInfo["type"]) {
     id,
     type,
   })
-    .setExpirationTime("60d")
     .setProtectedHeader({ alg: "HS256" })
     .sign(new TextEncoder().encode(process.env.JWT_SECRET!))
 }
