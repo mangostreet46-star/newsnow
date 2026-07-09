@@ -185,15 +185,6 @@ export const currentSourcesAtom = atom((get) => {
     set(currentFocusTabSourcesAtom, update)
     return
   }
-  const _ = update instanceof Function ? update(get(currentSourcesAtom)) : update
-  set(primitiveMetadataAtom, {
-    updatedTime: Date.now(),
-    action: "manual",
-    data: {
-      ...get(primitiveMetadataAtom).data,
-      [get(currentColumnIDAtom)]: _,
-    },
-  })
 })
 
 export const autoRefreshSourcesAtom = atom((get) => {

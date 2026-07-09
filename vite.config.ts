@@ -26,10 +26,7 @@ export default defineConfig({
       // autoCodeSplitting: true,
     }),
     unimport.vite({
-      dirs: ["src/hooks", "shared", "src/utils"],
-      dirsScanOptions: {
-        fileFilter: file => !file.endsWith("/shared/dir.ts"),
-      },
+      dirs: ["src/hooks", "src/utils", "shared/{consts,metadata,sources,type.util,utils,verify}.ts"],
       presets: ["react", {
         from: "jotai",
         imports: ["atom", "useAtom", "useAtomValue", "useSetAtom"],
